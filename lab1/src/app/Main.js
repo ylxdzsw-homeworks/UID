@@ -8,6 +8,8 @@ import RadioButton from 'material-ui/lib/radio-button'
 import SelectField from 'material-ui/lib/SelectField'
 import MenuItem from 'material-ui/lib/menus/menu-item'
 import AutoComplete from 'material-ui/lib/auto-complete'
+import LinearProgress from 'material-ui/lib/linear-progress'
+import Checkbox from 'material-ui/lib/checkbox'
 
 import Field from './Field.js'
 
@@ -28,10 +30,35 @@ const styles = {
     },
     floatingLabelStyle: {
         color: 'rgba(0,0,0,0.6)'
+    },
+    radioButton: {
+        width: 60,
+        float: 'left',
+        paddingLeft: 30,
+        fontSize: 16
+    },
+    checkbox: {
+        display: 'inline-block',
+        width: '50%',
+        fontSize: 16,
+        marginTop: 10
+    },
+    progress: {
+        position: 'fixed',
+        top: 0,
+        paddingTop: 10,
+        width: '95%',
+        maxWidth: 512,
+        backgroundColor: 'white',
+        zIndex: 10086
     }
 }
 
 const numtoitem = i => <MenuItem value={i} key={i} primaryText={i} />
+const strtoitem = i => <Checkbox label={i} key={i} style={styles.checkbox} />
+const years     = Array(47).fill().map((_,x)=>x+1970).map(numtoitem)
+const months    = Array(12).fill().map((_,x)=>x+1).map(numtoitem)
+const interests = ["IT互联网", "创业", "设计", "体育", "财经", "摄影", "其他"].map(strtoitem)
 
 class Main extends React.Component {
     constructor(props, context) {
@@ -41,6 +68,10 @@ class Main extends React.Component {
     render() {
         return (
             <div style={styles.container}>
+                <div style={styles.progress}>
+                    <span>已完成7/14</span>
+                    <LinearProgress mode="determinate" value={60} />
+                </div>
                 <h1>账号信息:</h1>
                 <TextField
                     type="email"
@@ -73,29 +104,17 @@ class Main extends React.Component {
                 <div style={styles.clear} />
                 <h1 style={{ marginTop: 60 }}>基本信息:</h1>
                 <Field title="性别:">
-                    <div style={{ height: 36, paddingTop: 12 }}>
+                    <div style={{ height: 36, paddingTop: 14 }}>
                         <RadioButtonGroup name="gender">
-                            <RadioButton
-                                style={{ width: 60, float: 'left' }}
-                                value="male"
-                                label="男"
-                            />
-                            <RadioButton
-                                style={{ width: 60, float: 'left' }}
-                                value="female"
-                                label="女"
-                            />
+                            <RadioButton style={styles.radioButton} value="male" label="男" />
+                            <RadioButton style={styles.radioButton} value="female" label="女" />
                         </RadioButtonGroup>
                     </div>
                 </Field>
                 <Field title="出生年月:">
-                    <SelectField maxHeight={300} style={{ width: 120 }}>
-                        {Array(47).fill().map((_,x)=>x+1970).map(numtoitem)}
-                    </SelectField>
+                    <SelectField maxHeight={300} style={{ width: 120 }}>{years}</SelectField>
                     <span style={{ verticalAlign: '16px', fontSize: 18, margin: '0 10px' }}>年</span>
-                    <SelectField maxHeight={300} style={{ width: 120 }}>
-                        {Array(12).fill().map((_,x)=>x+1).map(numtoitem)}
-                    </SelectField>
+                    <SelectField maxHeight={300} style={{ width: 120 }}>{months}</SelectField>
                     <span style={{ verticalAlign: '16px', fontSize: 18, marginLeft: '10px' }}>月</span>
                 </Field>
                 <Field title="专业:">
@@ -104,6 +123,9 @@ class Main extends React.Component {
                         dataSource={[1,2,3,4,5]}
                         fullWidth={true}
                     />
+                </Field>
+                <Field title="兴趣领域:">
+                    <div style={{ padding: '4px 0 15px 0' }}>{interests}</div>
                 </Field>
             </div>
         )

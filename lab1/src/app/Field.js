@@ -8,14 +8,15 @@ const styles = {
         margin: 0,
         float: 'left',
         width: '35%',
-        height: 48,
-        lineHeight: '48px',
+        height: 72,
+        lineHeight: '72px',
         fontSize: 18,
         fontWeight: 'normal',
         textAlign: 'right'
     },
     content: {
         float: 'right',
+        paddingTop: 10,
         width: '60%'
     },
     clear: {
