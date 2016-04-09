@@ -30,6 +30,11 @@ const styles = {
     floatingLabelStyle: {
         color: 'rgba(0,0,0,0.6)'
     },
+    label: {
+        fontSize: 18,
+        margin: '0 10px',
+        lineHeight: '56px'
+    },
     radioButton: {
         width: 60,
         float: 'left',
@@ -63,10 +68,37 @@ const strtoitem = i => <Checkbox label={i} key={i} style={styles.checkbox} />
 const years     = Array(47).fill().map((_,x)=>x+1970).map(numtoitem)
 const months    = Array(12).fill().map((_,x)=>x+1).map(numtoitem)
 const interests = ["IT互联网", "创业", "设计", "体育", "财经", "摄影", "其他"].map(strtoitem)
+const majors    = ["经济学", "金融学", "国际经济与贸易", "法学", "社会学", "思想政治教育", "汉语言文学", "英语", "俄语", "日语", "广告学", "数学与应用数学", "信息与计算科学", "应用物理学", "核物理", "应用化学", "空间科学与技术", "生物技术", "生物信息学", "理论与应用力学", "工程力学", "机械设计制造及其自动化", "材料成型及控制工程", "工业设计", "测控技术与仪器", "材料科学与工程", "材料物理", "材料化学", "高分子材料与工程", "复合材料与工程", "焊接技术与工程", "能源与动力工程", "电气工程及其自动化", "电子信息工程", "电子科学与技术", "通信工程", "光电信息科学与工程", "电子封装技术", "电磁场与无线技术", "电子信息科学与技术", "自动化"]
 
 class Main extends React.Component {
     constructor(props, context) {
         super(props, context)
+
+        this.state = {
+            email: '',
+            emailerr: '',
+            name: '',
+            nameerr: '',
+            password: '',
+            passworderr: '',
+            repassword: '',
+            repassworderr: '',
+            gender: '',
+            year: 0,
+            month: 0
+        }
+
+        this.validate = this.validate.bind(this)
+    }
+
+    validate() {
+        this.setState({
+            emailerr: formula.email.test(this.state.email.trim()) ? '' : "电子邮箱格式不正确",
+            nameerr: formula.name.test(this.state.name.trim()) ? '' : "昵称必须全为字母，并且不超过12个字符",
+            passworderr: formula.password.test(this.state.password) ? '' : "密码长度必须为6-18",
+            repassworderr: (this.state.password == this.state.repassword ? '' : "两次输入密码不一致")
+                           || (formula.password.test(this.state.password) ? '' : "密码长度必须为6-18"),
+        })
     }
 
     render() {
@@ -83,6 +115,9 @@ class Main extends React.Component {
                     floatingLabelStyle={styles.floatingLabelStyle}
                     floatingLabelText="邮箱："
                     hintText="请输入email地址"
+                    errorText={this.state.email && this.state.emailerr}
+                    onChange={(e)=>this.setState({email: e.target.value})}
+                    onBlur={this.validate}
                 />
                 <TextField
                     type="text"
@@ -90,6 +125,9 @@ class Main extends React.Component {
                     floatingLabelStyle={styles.floatingLabelStyle}
                     floatingLabelText="昵称："
                     hintText="昵称由字母组成，长度小于12"
+                    errorText={this.state.name && this.state.nameerr}
+                    onChange={(e)=>this.setState({name: e.target.value})}
+                    onBlur={this.validate}
                 />
                 <TextField
                     type="password"
@@ -97,6 +135,9 @@ class Main extends React.Component {
                     floatingLabelStyle={styles.floatingLabelStyle}
                     floatingLabelText="密码："
                     hintText="密码长度为6-18"
+                    errorText={this.state.password && this.state.passworderr}
+                    onChange={(e)=>this.setState({password: e.target.value})}
+                    onBlur={this.validate}
                 />
                 <TextField
                     type="password"
@@ -104,28 +145,51 @@ class Main extends React.Component {
                     floatingLabelStyle={styles.floatingLabelStyle}
                     floatingLabelText="确认密码："
                     hintText="再次输入密码"
+                    errorText={this.state.repassword && this.state.repassworderr}
+                    onChange={(e)=>this.setState({repassword: e.target.value})}
+                    onBlur={this.validate}
                 />
                 <div style={styles.clear} />
                 <h1 style={{ marginTop: 60 }}>基本信息:</h1>
                 <Field title="性别:">
                     <div style={{ height: 36, paddingTop: 14 }}>
-                        <RadioButtonGroup name="gender">
+                        <RadioButtonGroup name="gender" onChange={(e,v)=>this.setState({gender: v})}>
                             <RadioButton style={styles.radioButton} value="male" label="男" />
                             <RadioButton style={styles.radioButton} value="female" label="女" />
                         </RadioButtonGroup>
                     </div>
                 </Field>
                 <Field title="出生年月:">
-                    <SelectField maxHeight={300} style={{ width: 120 }}>{years}</SelectField>
-                    <span style={{ verticalAlign: '16px', fontSize: 18, margin: '0 10px' }}>年</span>
-                    <SelectField maxHeight={300} style={{ width: 120 }}>{months}</SelectField>
-                    <span style={{ verticalAlign: '16px', fontSize: 18, marginLeft: '10px' }}>月</span>
+                    <div style={{ verticalAlign: 'center' }}>
+                        <SelectField
+                            maxHeight={300}
+                            style={{ width: 120, verticalAlign: 'top' }}
+                            labelStyle={{ textAlign: 'center' }}
+                            value={this.state.year}
+                            onChange={(e,i,v)=>this.setState({year: v})}
+                        >
+                            {years}
+                        </SelectField>
+                        <span style={styles.label}>年</span>
+                        <SelectField
+                            maxHeight={300}
+                            style={{ width: 120, verticalAlign: 'top' }}
+                            labelStyle={{ textAlign: 'center' }}
+                            value={this.state.month}
+                            onChange={(e,i,v)=>this.setState({month: v})}
+                        >
+                            {months}
+                        </SelectField>
+                        <span style={styles.label}>月</span>
+                    </div>
                 </Field>
                 <Field title="专业:">
                     <AutoComplete
                         hintText="请输入或选择你的专业"
-                        dataSource={[1,2,3,4,5]}
+                        dataSource={majors}
                         fullWidth={true}
+                        filter={(pattern, text)=>text.includes(pattern)}
+                        triggerUpdateOnFocus={true}
                     />
                 </Field>
                 <Field title="兴趣领域:">
@@ -153,3 +217,9 @@ class Main extends React.Component {
 }
 
 export default Main
+
+const formula = {
+    email: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+    name: /^[a-zA-Z]{1,12}$/,
+    password: /^.{6,18}$/
+}
