@@ -1,7 +1,6 @@
 import React from 'react'
 import RaisedButton from 'material-ui/lib/raised-button'
 import Dialog from 'material-ui/lib/dialog'
-import FlatButton from 'material-ui/lib/flat-button'
 import TextField from 'material-ui/lib/text-field'
 import RadioButtonGroup from 'material-ui/lib/radio-button-group'
 import RadioButton from 'material-ui/lib/radio-button'
@@ -42,6 +41,11 @@ const styles = {
         width: '50%',
         fontSize: 16,
         marginTop: 10
+    },
+    button: {
+        float: 'left',
+        textAlign: 'left',
+        width: '50%'
     },
     progress: {
         position: 'fixed',
@@ -126,6 +130,22 @@ class Main extends React.Component {
                 </Field>
                 <Field title="兴趣领域:">
                     <div style={{ padding: '4px 0 15px 0' }}>{interests}</div>
+                </Field>
+                <Field title="">
+                    <div style={styles.button}>
+                        <RaisedButton
+                            label="清空"
+                            style={{ width: '80%' }}
+                            secondary={true}
+                        />
+                    </div>
+                    <div style={styles.button}>
+                        <RaisedButton
+                            label="提交"
+                            style={{ width: '80%' }}
+                            primary={true}
+                        />
+                    </div>
                 </Field>
             </div>
         )
