@@ -64,17 +64,35 @@ const styles = {
 }
 
 const numtoitem = i => <MenuItem value={i} key={i} primaryText={i} />
-const strtoitem = i => <Checkbox label={i} key={i} style={styles.checkbox} />
+const strtoitem = function(i){
+    return (
+        <Checkbox label={i} key={i} style={styles.checkbox}
+            checked={this.state.interest[i]}
+            onCheck={(e,v) => {
+                console.log(e,v)
+                this.state.interest[i] = v
+                this.setState({interest: this.state.interest})
+            }}
+        />
+    )
+}
 const years     = Array(47).fill().map((_,x)=>x+1970).map(numtoitem)
 const months    = Array(12).fill().map((_,x)=>x+1).map(numtoitem)
-const interests = ["IT互联网", "创业", "设计", "体育", "财经", "摄影", "其他"].map(strtoitem)
+const interests = ["IT互联网", "创业", "设计", "体育", "财经", "摄影", "其他"]
 const majors    = ["经济学", "金融学", "国际经济与贸易", "法学", "社会学", "思想政治教育", "汉语言文学", "英语", "俄语", "日语", "广告学", "数学与应用数学", "信息与计算科学", "应用物理学", "核物理", "应用化学", "空间科学与技术", "生物技术", "生物信息学", "理论与应用力学", "工程力学", "机械设计制造及其自动化", "材料成型及控制工程", "工业设计", "测控技术与仪器", "材料科学与工程", "材料物理", "材料化学", "高分子材料与工程", "复合材料与工程", "焊接技术与工程", "能源与动力工程", "电气工程及其自动化", "电子信息工程", "电子科学与技术", "通信工程", "光电信息科学与工程", "电子封装技术", "电磁场与无线技术", "电子信息科学与技术", "自动化"]
 
 class Main extends React.Component {
     constructor(props, context) {
         super(props, context)
 
-        this.state = {
+        this.state = this.getInitialState()
+
+        this.validate = this.validate.bind(this)
+        this.reset    = this.reset.bind(this)
+    }
+
+    getInitialState() {
+        return {
             email: '',
             emailerr: '',
             name: '',
@@ -85,10 +103,10 @@ class Main extends React.Component {
             repassworderr: '',
             gender: '',
             year: 0,
-            month: 0
+            month: 0,
+            major: '',
+            interest: (_=>{let p={};interests.forEach(x=>p[x]=false);return p})()
         }
-
-        this.validate = this.validate.bind(this)
     }
 
     validate() {
@@ -99,6 +117,10 @@ class Main extends React.Component {
             repassworderr: (this.state.password == this.state.repassword ? '' : "两次输入密码不一致")
                            || (formula.password.test(this.state.password) ? '' : "密码长度必须为6-18"),
         })
+    }
+
+    reset() {
+        this.setState(this.getInitialState())
     }
 
     render() {
@@ -116,8 +138,10 @@ class Main extends React.Component {
                     floatingLabelText="邮箱："
                     hintText="请输入email地址"
                     errorText={this.state.email && this.state.emailerr}
-                    onChange={(e)=>this.setState({email: e.target.value})}
+                    onChange={e=>this.setState({email: e.target.value})}
+                    onFocus={e=>this.setState({emailerr: ''})}
                     onBlur={this.validate}
+                    value={this.state.email}
                 />
                 <TextField
                     type="text"
@@ -126,8 +150,10 @@ class Main extends React.Component {
                     floatingLabelText="昵称："
                     hintText="昵称由字母组成，长度小于12"
                     errorText={this.state.name && this.state.nameerr}
-                    onChange={(e)=>this.setState({name: e.target.value})}
+                    onChange={e=>this.setState({name: e.target.value})}
+                    onFocus={e=>this.setState({nameerr: ''})}
                     onBlur={this.validate}
+                    value={this.state.name}
                 />
                 <TextField
                     type="password"
@@ -136,8 +162,10 @@ class Main extends React.Component {
                     floatingLabelText="密码："
                     hintText="密码长度为6-18"
                     errorText={this.state.password && this.state.passworderr}
-                    onChange={(e)=>this.setState({password: e.target.value})}
+                    onChange={e=>this.setState({password: e.target.value})}
+                    onFocus={e=>this.setState({passworderr: ''})}
                     onBlur={this.validate}
+                    value={this.state.password}
                 />
                 <TextField
                     type="password"
@@ -146,14 +174,16 @@ class Main extends React.Component {
                     floatingLabelText="确认密码："
                     hintText="再次输入密码"
                     errorText={this.state.repassword && this.state.repassworderr}
-                    onChange={(e)=>this.setState({repassword: e.target.value})}
+                    onChange={e=>this.setState({repassword: e.target.value})}
+                    onFocus={e=>this.setState({repassworderr: ''})}
                     onBlur={this.validate}
+                    value={this.state.repassword}
                 />
                 <div style={styles.clear} />
                 <h1 style={{ marginTop: 60 }}>基本信息:</h1>
                 <Field title="性别:">
                     <div style={{ height: 36, paddingTop: 14 }}>
-                        <RadioButtonGroup name="gender" onChange={(e,v)=>this.setState({gender: v})}>
+                        <RadioButtonGroup name="gender" onChange={(e,v)=>this.setState({gender: v})} valueSelected={this.state.gender}>
                             <RadioButton style={styles.radioButton} value="male" label="男" />
                             <RadioButton style={styles.radioButton} value="female" label="女" />
                         </RadioButtonGroup>
@@ -189,11 +219,14 @@ class Main extends React.Component {
                         dataSource={majors}
                         fullWidth={true}
                         filter={(pattern, text)=>text.includes(pattern)}
-                        triggerUpdateOnFocus={true}
+                        openOnFocus={true}
+                        searchText={this.state.major}
+                        onUpdateInput={v=>this.setState({major: v})}
+                        onNewRequest={v=>this.setState({major: v})}
                     />
                 </Field>
                 <Field title="兴趣领域:">
-                    <div style={{ padding: '4px 0 15px 0' }}>{interests}</div>
+                    <div style={{ padding: '4px 0 15px 0' }}>{interests.map(strtoitem.bind(this))}</div>
                 </Field>
                 <Field title="">
                     <div style={styles.button}>
@@ -201,6 +234,7 @@ class Main extends React.Component {
                             label="清空"
                             style={{ width: '80%' }}
                             secondary={true}
+                            onTouchTap={this.reset}
                         />
                     </div>
                     <div style={styles.button}>
