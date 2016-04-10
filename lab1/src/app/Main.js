@@ -92,6 +92,23 @@ const actions   = function(i){
         <FlatButton label="确定" primary={true} keyboardFocused={true} onTouchTap={_=>document.body.innerHTML = "<h1>提交成功</h1>"} />
     ]
 }
+const jump = function(prev, next){
+    return (e) => {
+        switch(e.keyCode){
+            case 39:
+                if(!e.ctrlKey) break
+            case 13:
+            case 40:
+                this.refs[next].focus()
+                break
+            case 37:
+                if(!e.ctrlKey) break
+            case 38:
+                this.refs[prev].focus()
+                break
+        }
+    }
+}
 
 class Main extends React.Component {
     constructor(props, context) {
@@ -125,11 +142,11 @@ class Main extends React.Component {
 
     validate() {
         this.setState({
-            emailerr: formula.email.test(this.state.email.trim()) && "电子邮箱格式不正确",
-            nameerr: formula.name.test(this.state.name.trim()) && "昵称必须全为字母，并且不超过12个字符",
-            passworderr: formula.password.test(this.state.password) && "密码长度必须为6-18",
-            repassworderr: (this.state.password == this.state.repassword && "两次输入密码不一致")
-                           || (formula.password.test(this.state.password) && "密码长度必须为6-18"),
+            emailerr: formula.email.test(this.state.email.trim()) || "电子邮箱格式不正确",
+            nameerr: formula.name.test(this.state.name.trim()) || "昵称必须全为字母，并且不超过12个字符",
+            passworderr: formula.password.test(this.state.password) || "密码长度必须为6-18",
+            repassworderr: (this.state.password == this.state.repassword || "两次输入密码不一致")
+                           || (formula.password.test(this.state.password) || "密码长度必须为6-18"),
         })
     }
 
@@ -145,7 +162,6 @@ class Main extends React.Component {
             (!this.state.repassworderr && !!this.state.repassword) +
             !!this.state.gender +
             !!(this.state.year && this.state.month) +
-             +
             !!this.state.major +
             Object.keys(this.state.interest)
                   .map(x=>this.state.interest[x])
@@ -161,6 +177,7 @@ class Main extends React.Component {
                 </div>
                 <h1>账号信息:</h1>
                 <TextField
+                    ref="email"
                     type="email"
                     style={styles.accountInfo}
                     floatingLabelStyle={styles.floatingLabelStyle}
@@ -170,9 +187,11 @@ class Main extends React.Component {
                     onChange={e=>this.setState({email: e.target.value})}
                     onFocus={e=>this.setState({emailerr: ''})}
                     onBlur={this.validate}
+                    onKeyDown={jump.call(this, '', 'name')}
                     value={this.state.email}
                 />
                 <TextField
+                    ref="name"
                     type="text"
                     style={styles.accountInfo}
                     floatingLabelStyle={styles.floatingLabelStyle}
@@ -182,9 +201,11 @@ class Main extends React.Component {
                     onChange={e=>this.setState({name: e.target.value})}
                     onFocus={e=>this.setState({nameerr: ''})}
                     onBlur={this.validate}
+                    onKeyDown={jump.call(this, 'email', 'password')}
                     value={this.state.name}
                 />
                 <TextField
+                    ref="password"
                     type="password"
                     style={styles.accountInfo}
                     floatingLabelStyle={styles.floatingLabelStyle}
@@ -194,9 +215,11 @@ class Main extends React.Component {
                     onChange={e=>this.setState({password: e.target.value})}
                     onFocus={e=>this.setState({passworderr: ''})}
                     onBlur={this.validate}
+                    onKeyDown={jump.call(this, 'name', 'repassword')}
                     value={this.state.password}
                 />
                 <TextField
+                    ref="repassword"
                     type="password"
                     style={styles.accountInfo}
                     floatingLabelStyle={styles.floatingLabelStyle}
@@ -206,6 +229,7 @@ class Main extends React.Component {
                     onChange={e=>this.setState({repassword: e.target.value})}
                     onFocus={e=>this.setState({repassworderr: ''})}
                     onBlur={this.validate}
+                    onKeyDown={jump.call(this, 'password', '')}
                     value={this.state.repassword}
                 />
                 <div style={styles.clear} />
