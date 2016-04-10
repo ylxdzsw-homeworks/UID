@@ -142,11 +142,11 @@ class Main extends React.Component {
 
     validate() {
         this.setState({
-            emailerr: formula.email.test(this.state.email.trim()) || "电子邮箱格式不正确",
-            nameerr: formula.name.test(this.state.name.trim()) || "昵称必须全为字母，并且不超过12个字符",
-            passworderr: formula.password.test(this.state.password) || "密码长度必须为6-18",
-            repassworderr: (this.state.password == this.state.repassword || "两次输入密码不一致")
-                           || (formula.password.test(this.state.password) || "密码长度必须为6-18"),
+            emailerr: formula.email.test(this.state.email.trim()) ? '' : "电子邮箱格式不正确",
+            nameerr: formula.name.test(this.state.name.trim()) ? '' : "昵称必须全为字母，并且不超过12个字符",
+            passworderr: formula.password.test(this.state.password) ? '' : "密码长度必须为6-18",
+            repassworderr: (this.state.password == this.state.repassword ? '' : "两次输入密码不一致")
+                           || (formula.password.test(this.state.password) ? '' : "密码长度必须为6-18"),
         })
     }
 
