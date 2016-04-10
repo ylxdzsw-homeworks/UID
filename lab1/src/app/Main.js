@@ -1,5 +1,6 @@
 import React from 'react'
 import RaisedButton from 'material-ui/lib/raised-button'
+import FlatButton from 'material-ui/lib/flat-button'
 import Dialog from 'material-ui/lib/dialog'
 import TextField from 'material-ui/lib/text-field'
 import RadioButtonGroup from 'material-ui/lib/radio-button-group'
@@ -9,6 +10,7 @@ import MenuItem from 'material-ui/lib/menus/menu-item'
 import AutoComplete from 'material-ui/lib/auto-complete'
 import LinearProgress from 'material-ui/lib/linear-progress'
 import Checkbox from 'material-ui/lib/checkbox'
+import Snackbar from 'material-ui/lib/snackbar'
 
 import Field from './Field.js'
 
@@ -69,7 +71,6 @@ const strtoitem = function(i){
         <Checkbox label={i} key={i} style={styles.checkbox}
             checked={this.state.interest[i]}
             onCheck={(e,v) => {
-                console.log(e,v)
                 this.state.interest[i] = v
                 this.setState({interest: this.state.interest})
             }}
@@ -80,6 +81,12 @@ const years     = Array(47).fill().map((_,x)=>x+1970).map(numtoitem)
 const months    = Array(12).fill().map((_,x)=>x+1).map(numtoitem)
 const interests = ["IT互联网", "创业", "设计", "体育", "财经", "摄影", "其他"]
 const majors    = ["经济学", "金融学", "国际经济与贸易", "法学", "社会学", "思想政治教育", "汉语言文学", "英语", "俄语", "日语", "广告学", "数学与应用数学", "信息与计算科学", "应用物理学", "核物理", "应用化学", "空间科学与技术", "生物技术", "生物信息学", "理论与应用力学", "工程力学", "机械设计制造及其自动化", "材料成型及控制工程", "工业设计", "测控技术与仪器", "材料科学与工程", "材料物理", "材料化学", "高分子材料与工程", "复合材料与工程", "焊接技术与工程", "能源与动力工程", "电气工程及其自动化", "电子信息工程", "电子科学与技术", "通信工程", "光电信息科学与工程", "电子封装技术", "电磁场与无线技术", "电子信息科学与技术", "自动化"]
+const actions   = function(i){
+    return [
+        <FlatButton label="取消" secondary={true} onTouchTap={_=>this.setState({confirming: false})} />,
+        <FlatButton label="确定" primary={true} keyboardFocused={true} onTouchTap={_=>document.body.innerHTML = "<h1>提交成功</h1>"} />
+    ]
+}
 
 class Main extends React.Component {
     constructor(props, context) {
@@ -91,7 +98,7 @@ class Main extends React.Component {
         this.reset    = this.reset.bind(this)
     }
 
-    getInitialState() {
+    getInitialState(lastState) {
         return {
             email: '',
             emailerr: '',
@@ -105,7 +112,9 @@ class Main extends React.Component {
             year: 0,
             month: 0,
             major: '',
-            interest: (_=>{let p={};interests.forEach(x=>p[x]=false);return p})()
+            interest: (_=>{let p={};interests.forEach(x=>p[x]=false);return p})(),
+            confirming: false,
+            lastState: lastState
         }
     }
 
@@ -120,13 +129,13 @@ class Main extends React.Component {
     }
 
     reset() {
-        this.setState(this.getInitialState())
+        this.setState(this.getInitialState(this.state))
     }
 
     render() {
         return (
             <div style={styles.container}>
-                <div style={styles.progress}>
+                <div style={Object.assign(styles.progress, {display: this.state.confirming ? 'none' : 'block'})}>
                     <span>已完成7/14</span>
                     <LinearProgress mode="determinate" value={60} />
                 </div>
@@ -242,9 +251,26 @@ class Main extends React.Component {
                             label="提交"
                             style={{ width: '80%' }}
                             primary={true}
+                            onTouchTap={_=>this.setState({confirming: true})}
                         />
                     </div>
                 </Field>
+                <Snackbar
+                    open={Boolean(this.state.lastState)}
+                    message="所有字段已清空"
+                    action="撤销"
+                    autoHideDuration={3000}
+                    onActionTouchTap={_=>this.setState(this.state.lastState)}
+                    onRequestClose={_=>this.setState({lastState:null})}
+                />
+                <Dialog
+                    title="确认提交"
+                    actions={actions.call(this)}
+                    modal={true}
+                    open={this.state.confirming}
+                >
+                    是否确认提交当前填写的信息?
+                </Dialog>
             </div>
         )
     }
