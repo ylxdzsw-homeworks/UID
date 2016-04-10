@@ -132,12 +132,27 @@ class Main extends React.Component {
         this.setState(this.getInitialState(this.state))
     }
 
+    finished() {
+        return +
+            (!this.state.emailerr && !!this.state.email) +
+            (!this.state.nameerr && !!this.state.name) +
+            (!this.state.passworderr && !!this.state.password) +
+            (!this.state.repassworderr && !!this.state.repassword) +
+            !!this.state.gender +
+            !!(this.state.year && this.state.month) +
+             +
+            !!this.state.major +
+            Object.keys(this.state.interest)
+                  .map(x=>this.state.interest[x])
+                  .some(x=>x)
+    }
+
     render() {
         return (
             <div style={styles.container}>
                 <div style={Object.assign(styles.progress, {display: this.state.confirming ? 'none' : 'block'})}>
-                    <span>已完成7/14</span>
-                    <LinearProgress mode="determinate" value={60} />
+                    <span>已完成{this.finished()}/8</span>
+                    <LinearProgress mode="determinate" value={this.finished()} min={0} max={8} />
                 </div>
                 <h1>账号信息:</h1>
                 <TextField
@@ -252,6 +267,7 @@ class Main extends React.Component {
                             style={{ width: '80%' }}
                             primary={true}
                             onTouchTap={_=>this.setState({confirming: true})}
+                            disabled={this.finished() < 8}
                         />
                     </div>
                 </Field>
