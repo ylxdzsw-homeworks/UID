@@ -1,5 +1,5 @@
 import React from 'react'
-import {stop_event} from './utils.js'
+import {stopEvent} from './utils.js'
 import NavBar from './NavBar.js'
 import Player from './Player.js'
 import PlayList from './PlayList.js'
@@ -21,15 +21,37 @@ class Main extends React.Component {
         }
 
         this.dropHandler = this.dropHandler.bind(this)
+        this.play        = this.play.bind(this)
+    }
+
+    componentDidMount() {
+        document.body.addEventListener('dragenter', stopEvent, true)
+        document.body.addEventListener('dragover', stopEvent, true)
+        document.body.addEventListener('drop', this.dropHandler, true)
     }
 
     dropHandler(e) {
-        stop_event(e)
+        stopEvent(e)
         if(!e.dataTransfer.files) return
 
-        const file = e.dataTransfer.files[0]
+        const files = e.dataTransfer.files
         const reader = new FileReader()
 
+        this.setState({playlist: this.state.playlist.concat([].slice.call(files))})
+    }
+
+    play(n) {
+        const file = this.state.playlist[n]
+        const reader = new FileReader()
+        reader.readAsArrayBuffer(file)
+        reader.onload = () => {
+            ac.decodeAudioData(reader.result, buffer => {
+                const playSound = ac.createBufferSource()
+                playSound.buffer = buffer
+                playSound.connect(ac.destination)
+                playSound.start(0)
+            })
+        }
     }
 
     render() {
@@ -37,7 +59,7 @@ class Main extends React.Component {
             <div style={styles.container}>
                 <NavBar />
                 <Player />
-                <PlayList />
+                <PlayList playlist={this.state.playlist} onSelect={this.play} />
             </div>
         )
     }

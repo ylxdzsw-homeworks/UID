@@ -1,6 +1,7 @@
 import React from 'react'
 import List from 'material-ui/lib/lists/list'
 import ListItem from 'material-ui/lib/lists/list-item'
+import Subheader from 'material-ui/lib/Subheader'
 
 const styles = {
     listitem: {
@@ -18,8 +19,11 @@ class PlayList extends React.Component {
 
     render() {
         return (
-            <List subheader="播放列表">
-                <ListItem style={styles.listitem} primaryText="fuck" />
+            <List>
+                <Subheader>播放列表</Subheader>
+                {this.props.playlist.map((x,i) =>
+                    <ListItem style={styles.listitem} key={i} primaryText={x.name}
+                              onClick={()=>this.props.onSelect(i)} />)}
             </List>
         )
     }
