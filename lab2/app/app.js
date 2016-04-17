@@ -6,6 +6,6 @@ import Main from './Main'
 
 injectTapEventPlugin()
 
-ReactDOM.render(<Main />, document.getElementById('app'))
-
 window.ac = new (window.AudioContext || window.webkitAudioContext)()
+
+ReactDOM.render(<Main />, document.getElementById('app'))

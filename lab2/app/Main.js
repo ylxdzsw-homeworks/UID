@@ -3,9 +3,11 @@ import {stopEvent} from './utils.js'
 import NavBar from './NavBar.js'
 import Player from './Player.js'
 import PlayList from './PlayList.js'
+import Visualizer from './Visualizer.js'
 
 const styles = {
     container: {
+        paddingTop: 10,
         maxWidth: 600,
         minWidth: 400,
         margin: 'auto'
@@ -16,12 +18,21 @@ class Main extends React.Component {
     constructor(props, context) {
         super(props, context)
 
+        const acsource = ac.createBufferSource()
+        const acanalyser = ac.createAnalyser()
+
+        acsource.connect(ac.destination)
+        acsource.connect(acanalyser)
+
         this.state = {
-            playlist: []
+            playlist: [],
+            source: acsource,
+            analyser: acanalyser
         }
 
         this.dropHandler = this.dropHandler.bind(this)
         this.play        = this.play.bind(this)
+        this.select      = this.select.bind(this)
     }
 
     componentDidMount() {
@@ -40,26 +51,29 @@ class Main extends React.Component {
         this.setState({playlist: this.state.playlist.concat([].slice.call(files))})
     }
 
-    play(n) {
+    select(n) {
         const file = this.state.playlist[n]
         const reader = new FileReader()
         reader.readAsArrayBuffer(file)
         reader.onload = () => {
             ac.decodeAudioData(reader.result, buffer => {
-                const playSound = ac.createBufferSource()
-                playSound.buffer = buffer
-                playSound.connect(ac.destination)
-                playSound.start(0)
+                this.state.source.buffer = buffer
+                this.play()
             })
         }
+    }
+
+    play() {
+        this.state.source.start(0)
     }
 
     render() {
         return (
             <div style={styles.container}>
                 <NavBar />
+                <Visualizer analyser={this.state.analyser}/>
                 <Player />
-                <PlayList playlist={this.state.playlist} onSelect={this.play} />
+                <PlayList playlist={this.state.playlist} onSelect={this.select} />
             </div>
         )
     }

@@ -20,7 +20,7 @@ class PlayList extends React.Component {
     render() {
         return (
             <List>
-                <Subheader>播放列表</Subheader>
+                <Subheader>{this.props.playlist.length ? "播放列表" : "将文件拖拽至此处以添加到播放列表"}</Subheader>
                 {this.props.playlist.map((x,i) =>
                     <ListItem style={styles.listitem} key={i} primaryText={x.name}
                               onClick={()=>this.props.onSelect(i)} />)}
