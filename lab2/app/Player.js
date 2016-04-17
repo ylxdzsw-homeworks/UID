@@ -35,26 +35,30 @@ class Player extends React.Component {
             <div>
                 <span style={styles.wrapper}>
                     <IconButton style={styles.button} onClick={this.props.prev}>
-                        <SkipPreviousIcon style={styles.icon} />
+                        <SkipPreviousIcon style={styles.icon} color={this.context.muiTheme.palette.primary1Color} />
                         {' '}
                     </IconButton>
                 </span>
                 <span style={styles.wrapper}>
                     <IconButton style={styles.button}
                                 onClick={this.props.playing?this.props.pause:this.props.play}>
-                        <PlayPauseIcon style={styles.icon} />
+                        <PlayPauseIcon style={styles.icon} color={this.context.muiTheme.palette.primary1Color} />
                         {' '}
                     </IconButton>
                 </span>
                 <span style={styles.wrapper}>
                     <IconButton style={styles.button} onClick={this.props.next}>
-                        <SkipNextIcon style={styles.icon} />
+                        <SkipNextIcon style={styles.icon} color={this.context.muiTheme.palette.primary1Color} />
                         {' '}
                     </IconButton>
                 </span>
             </div>
         )
     }
+}
+
+Player.contextTypes = {
+    muiTheme: React.PropTypes.object,
 }
 
 export default Player

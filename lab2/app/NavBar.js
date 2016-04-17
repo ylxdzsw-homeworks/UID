@@ -24,9 +24,9 @@ class NavBar extends React.Component {
             targetOrigin={{horizontal: 'right', vertical: 'top'}}
             anchorOrigin={{horizontal: 'right', vertical: 'top'}}
         >
-            <MenuItem primaryText="蓝白配色" />
-            <MenuItem primaryText="绿黑配色" />
-            <MenuItem primaryText="红黑配色" />
+            <MenuItem primaryText="蓝白配色" onTouchTap={()=>this.props.onSelect('brightBlue')} />
+            <MenuItem primaryText="红黑配色" onTouchTap={()=>this.props.onSelect('darkRed')} />
+            <MenuItem primaryText="绿黑配色" onTouchTap={()=>this.props.onSelect('darkGreen')} />
         </IconMenu>
 
         return (
@@ -50,6 +50,10 @@ class NavBar extends React.Component {
             </div>
         )
     }
+}
+
+NavBar.contextTypes = {
+    muiTheme: React.PropTypes.object,
 }
 
 export default NavBar

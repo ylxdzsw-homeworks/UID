@@ -1,9 +1,11 @@
 import React from 'react'
+import ColorManipulator from 'material-ui/lib/utils/color-manipulator'
 
 const styles = {
     canvas: {
         width: '100%',
-        height: 200
+        height: 200,
+        backgroundColor: 'rgba(128,128,128,0.1)'
     }
 }
 
@@ -39,14 +41,13 @@ class Visualizer extends React.Component {
 
         const draw = () => {
             const drawVisual = requestAnimationFrame(draw)
-            canvas.fillStyle = 'rgb(200,200,200)'
-            canvas.fillRect(0, 0, WIDTH, HEIGHT)
+            canvas.clearRect(0, 0, WIDTH, HEIGHT)
             switch (this.state.type) {
                 case 'wave': {
                     analyser.getByteTimeDomainData(dataArray)
 
                     canvas.lineWidth = 1
-                    canvas.strokeStyle = 'rgb(0, 0, 0)'
+                    canvas.strokeStyle = this.context.muiTheme.palette.primary1Color
                     canvas.beginPath()
 
                     const sliceWidth = WIDTH / bufferLength
@@ -68,7 +69,7 @@ class Visualizer extends React.Component {
                     let x = 0, y = 0
                     for (let i = Math.floor(bufferLength * 0.1); i < bufferLength; i+=8) {
                         y = dataArray[i]
-                        canvas.fillStyle = `rgb(${y+40}, 50, 50)`
+                        canvas.fillStyle = ColorManipulator.fade(this.context.muiTheme.palette.primary1Color, y/100)
                         canvas.fillRect(x, HEIGHT-y/2, barWidth, y)
                         x += barWidth + 1
                     }
@@ -86,6 +87,10 @@ class Visualizer extends React.Component {
                     onClick={this.changeType} />
         )
     }
+}
+
+Visualizer.contextTypes = {
+    muiTheme: React.PropTypes.object,
 }
 
 export default Visualizer

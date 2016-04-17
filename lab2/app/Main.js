@@ -1,16 +1,20 @@
 import React from 'react'
+import RefreshIndicator from 'material-ui/lib/refresh-indicator'
+import getMuiTheme from 'material-ui/lib/styles/getMuiTheme'
 import {stopEvent} from './utils.js'
 import NavBar from './NavBar.js'
 import Player from './Player.js'
 import PlayList from './PlayList.js'
 import Visualizer from './Visualizer.js'
+import {brightBlueTheme, darkRedTheme, darkGreenTheme} from './Themes.js'
 
 const styles = {
     container: {
         paddingTop: 10,
         maxWidth: 600,
         minWidth: 400,
-        margin: 'auto'
+        margin: 'auto',
+        position: 'relative'
     }
 }
 
@@ -27,7 +31,8 @@ class Main extends React.Component {
             current: 0,
             playing: false,
             position: 0,
-            startTime: 0
+            startTime: 0,
+            muiTheme: brightBlueTheme
         }
 
         this.dropHandler = this.dropHandler.bind(this)
@@ -36,12 +41,36 @@ class Main extends React.Component {
         this.prev        = this.prev.bind(this)
         this.pause       = this.pause.bind(this)
         this.select      = this.select.bind(this)
+        this.changeTheme = this.changeTheme.bind(this)
+    }
+
+    getChildContext() {
+        return {
+            muiTheme: getMuiTheme(this.state.muiTheme)
+        }
     }
 
     componentDidMount() {
         document.body.addEventListener('dragenter', stopEvent, true)
         document.body.addEventListener('dragover', stopEvent, true)
         document.body.addEventListener('drop', this.dropHandler, true)
+    }
+
+    changeTheme(x) {
+        switch (x) {
+            case 'brightBlue':
+                this.setState({muiTheme: brightBlueTheme})
+                document.body.style.backgroundColor = "white"
+                break
+            case 'darkRed':
+                this.setState({muiTheme: darkRedTheme})
+                document.body.style.backgroundColor = "rgb(48,48,48)"
+                break
+            case 'darkGreen':
+                this.setState({muiTheme: darkGreenTheme})
+                document.body.style.backgroundColor = "rgb(48,48,48)"
+                break
+        }
     }
 
     dropHandler(e) {
@@ -53,13 +82,11 @@ class Main extends React.Component {
         [].forEach.call(files, (file) => {
             const reader = new FileReader()
             reader.readAsArrayBuffer(file)
+            this.setState({loading: this.state.loading + 1})
             reader.onload = () => {
                 ac.decodeAudioData(reader.result, buffer => {
                     this.state.playlist.push({file: file, buffer: buffer})
-                    this.setState({playlist: this.state.playlist})
-                    if (this.state.playlist.length == 1) {// first time add files
-                        this.select(0)
-                    }
+                    this.setState({playlist: this.state.playlist, loading: this.state.loading - 1})
                 })
             }
         })
@@ -104,7 +131,8 @@ class Main extends React.Component {
     render() {
         return (
             <div style={styles.container}>
-                <NavBar />
+                <RefreshIndicator size={50} left={275} top={100} status={this.state.loading>0?'loading':'hide'}/>
+                <NavBar onSelect={this.changeTheme}/>
                 <Visualizer analyser={this.analyser}/>
                 <Player play={this.play} next={this.next} prev={this.prev}
                         pause={this.pause} playing={this.state.playing} />
@@ -113,6 +141,10 @@ class Main extends React.Component {
             </div>
         )
     }
+}
+
+Main.childContextTypes = {
+    muiTheme: React.PropTypes.object
 }
 
 export default Main

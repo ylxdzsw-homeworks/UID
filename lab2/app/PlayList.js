@@ -30,4 +30,8 @@ class PlayList extends React.Component {
     }
 }
 
+PlayList.contextTypes = {
+    muiTheme: React.PropTypes.object,
+}
+
 export default PlayList
