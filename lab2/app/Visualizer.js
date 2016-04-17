@@ -12,7 +12,7 @@ class Visualizer extends React.Component {
         super(props, context)
 
         this.state = {
-            type: 'wave'
+            type: 'bar'
         }
 
         this.changeType = this.changeType.bind(this)
@@ -21,8 +21,7 @@ class Visualizer extends React.Component {
     changeType() {
         const table = {
             wave: 'bar',
-            bar: 'info',
-            info: 'wave'
+            bar: 'wave'
         }
         this.setState({type: table[this.state.type]})
     }

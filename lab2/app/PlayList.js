@@ -2,6 +2,7 @@ import React from 'react'
 import List from 'material-ui/lib/lists/list'
 import ListItem from 'material-ui/lib/lists/list-item'
 import Subheader from 'material-ui/lib/Subheader'
+import VolumeUpIcon from 'material-ui/lib/svg-icons/av/volume-up'
 
 const styles = {
     listitem: {
@@ -22,8 +23,8 @@ class PlayList extends React.Component {
             <List>
                 <Subheader>{this.props.playlist.length ? "播放列表" : "将文件拖拽至此处以添加到播放列表"}</Subheader>
                 {this.props.playlist.map((x,i) =>
-                    <ListItem style={styles.listitem} key={i} primaryText={x.name}
-                              onClick={()=>this.props.onSelect(i)} />)}
+                    <ListItem style={styles.listitem} key={i} primaryText={x.file.name} onClick={()=>this.props.onSelect(i)}
+                              rightIcon={i==this.props.current ? <VolumeUpIcon /> : null} />)}
             </List>
         )
     }

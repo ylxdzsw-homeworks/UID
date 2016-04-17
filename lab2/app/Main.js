@@ -23,7 +23,8 @@ class Main extends React.Component {
         this.state = {
             playlist: [],
             source: null,
-            current: -1,
+            loading: 0,
+            current: 0,
             playing: false,
             position: 0,
             startTime: 0
@@ -33,7 +34,7 @@ class Main extends React.Component {
         this.play        = this.play.bind(this)
         this.next        = this.next.bind(this)
         this.prev        = this.prev.bind(this)
-        this.pause        = this.pause.bind(this)
+        this.pause       = this.pause.bind(this)
         this.select      = this.select.bind(this)
     }
 
@@ -47,41 +48,42 @@ class Main extends React.Component {
         stopEvent(e)
         if(!e.dataTransfer.files) return
 
-        const files = e.dataTransfer.files
-        const reader = new FileReader()
+        const files = e.dataTransfer.files;
 
-        this.setState({playlist: this.state.playlist.concat([].slice.call(files))})
-
-        if (this.state.playlist.length == files.length) { // first time add files
-            this.select(0)
-        }
+        [].forEach.call(files, (file) => {
+            const reader = new FileReader()
+            reader.readAsArrayBuffer(file)
+            reader.onload = () => {
+                ac.decodeAudioData(reader.result, buffer => {
+                    this.state.playlist.push({file: file, buffer: buffer})
+                    this.setState({playlist: this.state.playlist})
+                    if (this.state.playlist.length == 1) {// first time add files
+                        this.select(0)
+                    }
+                })
+            }
+        })
     }
 
     select(n) {
-        const file = this.state.playlist[n]
-        const reader = new FileReader()
-        reader.readAsArrayBuffer(file)
-        reader.onload = () => {
-            ac.decodeAudioData(reader.result, buffer => {
-                const source = ac.createBufferSource()
+        this.setState({position: 0, current: n})
 
-                source.connect(ac.destination)
-                source.connect(this.analyser)
-
-                this.setState({source: source, position: 0})
-
-                source.buffer = buffer
-                this.play()
-            })
-        }
-        this.state.source && this.state.source.stop()
+        setTimeout(this.play, 0)
     }
 
     play() {
-        if (!this.state.source) return alert("请先将音乐文件拖动到页面中以添加到播放列表")
-        this.setState({playing: true})
-        this.setState({startTime: ac.currentTime})
-        this.state.source.start(0, this.state.position)
+        if (!this.state.playlist.length) return alert("请先将音乐文件拖动到页面中以添加到播放列表")
+
+        this.state.source && this.state.source.stop()
+
+        const source = ac.createBufferSource()
+        source.buffer = this.state.playlist[this.state.current].buffer
+
+        source.connect(ac.destination)
+        source.connect(this.analyser)
+
+        source.start(0, this.state.position)
+        this.setState({source: source, playing: true, startTime: ac.currentTime})
     }
 
     next() {
@@ -96,7 +98,7 @@ class Main extends React.Component {
 
     pause() {
         this.state.source.stop()
-        this.setState({playing: false, position: ac.currentTime - this.state.startTime})
+        this.setState({playing: false, position: this.state.position + ac.currentTime - this.state.startTime})
     }
 
     render() {
@@ -106,7 +108,8 @@ class Main extends React.Component {
                 <Visualizer analyser={this.analyser}/>
                 <Player play={this.play} next={this.next} prev={this.prev}
                         pause={this.pause} playing={this.state.playing} />
-                <PlayList playlist={this.state.playlist} onSelect={this.select} />
+                <PlayList playlist={this.state.playlist} onSelect={this.select}
+                          current={this.state.current} />
             </div>
         )
     }
