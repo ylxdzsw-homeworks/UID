@@ -25,7 +25,8 @@ class Main extends React.Component {
             source: null,
             current: -1,
             playing: false,
-            position: 0
+            position: 0,
+            startTime: 0
         }
 
         this.dropHandler = this.dropHandler.bind(this)
@@ -50,6 +51,10 @@ class Main extends React.Component {
         const reader = new FileReader()
 
         this.setState({playlist: this.state.playlist.concat([].slice.call(files))})
+
+        if (this.state.playlist.length == files.length) { // first time add files
+            this.select(0)
+        }
     }
 
     select(n) {
@@ -63,31 +68,35 @@ class Main extends React.Component {
                 source.connect(ac.destination)
                 source.connect(this.analyser)
 
-                this.setState({source: source})
+                this.setState({source: source, position: 0})
 
                 source.buffer = buffer
                 this.play()
             })
         }
+        this.state.source && this.state.source.stop()
     }
 
     play() {
-        if (!this.state.source) return
+        if (!this.state.source) return alert("请先将音乐文件拖动到页面中以添加到播放列表")
         this.setState({playing: true})
-        this.state.source.start(this.state.position)
+        this.setState({startTime: ac.currentTime})
+        this.state.source.start(0, this.state.position)
     }
 
     next() {
-        console.log('next')
+        const n = this.state.playlist.length
+        this.select((this.state.current + 1) % n)
     }
 
     prev() {
-        console.log('prev')
+        const n = this.state.playlist.length
+        this.select((this.state.current || n) - 1)
     }
 
     pause() {
-        console.log('pause')
-        this.setState({playing: false})
+        this.state.source.stop()
+        this.setState({playing: false, position: ac.currentTime - this.state.startTime})
     }
 
     render() {
