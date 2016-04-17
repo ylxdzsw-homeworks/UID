@@ -28,7 +28,6 @@ class Visualizer extends React.Component {
     }
 
     componentDidMount() {
-        if (!this.props.analyser) return
         const analyser = this.props.analyser
         const canvas = this.refs.canvas.getContext('2d')
         const WIDTH = this.refs.canvas.width
@@ -69,8 +68,8 @@ class Visualizer extends React.Component {
                     const barWidth = WIDTH / bufferLength * 10
                     let x = 0, y = 0
                     for (let i = Math.floor(bufferLength * 0.1); i < bufferLength; i+=8) {
-                        y = dataArray[i] / 2
-                        canvas.fillStyle = `rgb(${y+100}, 50, 50)`
+                        y = dataArray[i]
+                        canvas.fillStyle = `rgb(${y+40}, 50, 50)`
                         canvas.fillRect(x, HEIGHT-y/2, barWidth, y)
                         x += barWidth + 1
                     }
@@ -84,7 +83,8 @@ class Visualizer extends React.Component {
 
     render() {
         return (
-            <canvas ref="canvas" width={600} height={200} style={styles.canvas} onClick={this.changeType} />
+            <canvas ref="canvas" width={600} height={200} style={styles.canvas}
+                    onClick={this.changeType} />
         )
     }
 }

@@ -18,20 +18,21 @@ class Main extends React.Component {
     constructor(props, context) {
         super(props, context)
 
-        const acsource = ac.createBufferSource()
-        const acanalyser = ac.createAnalyser()
-
-        acsource.connect(ac.destination)
-        acsource.connect(acanalyser)
+        this.analyser = ac.createAnalyser()
 
         this.state = {
             playlist: [],
-            source: acsource,
-            analyser: acanalyser
+            source: null,
+            current: -1,
+            playing: false,
+            position: 0
         }
 
         this.dropHandler = this.dropHandler.bind(this)
         this.play        = this.play.bind(this)
+        this.next        = this.next.bind(this)
+        this.prev        = this.prev.bind(this)
+        this.pause        = this.pause.bind(this)
         this.select      = this.select.bind(this)
     }
 
@@ -57,22 +58,45 @@ class Main extends React.Component {
         reader.readAsArrayBuffer(file)
         reader.onload = () => {
             ac.decodeAudioData(reader.result, buffer => {
-                this.state.source.buffer = buffer
+                const source = ac.createBufferSource()
+
+                source.connect(ac.destination)
+                source.connect(this.analyser)
+
+                this.setState({source: source})
+
+                source.buffer = buffer
                 this.play()
             })
         }
     }
 
     play() {
-        this.state.source.start(0)
+        if (!this.state.source) return
+        this.setState({playing: true})
+        this.state.source.start(this.state.position)
+    }
+
+    next() {
+        console.log('next')
+    }
+
+    prev() {
+        console.log('prev')
+    }
+
+    pause() {
+        console.log('pause')
+        this.setState({playing: false})
     }
 
     render() {
         return (
             <div style={styles.container}>
                 <NavBar />
-                <Visualizer analyser={this.state.analyser}/>
-                <Player />
+                <Visualizer analyser={this.analyser}/>
+                <Player play={this.play} next={this.next} prev={this.prev}
+                        pause={this.pause} playing={this.state.playing} />
                 <PlayList playlist={this.state.playlist} onSelect={this.select} />
             </div>
         )

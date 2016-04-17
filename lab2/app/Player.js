@@ -21,13 +21,6 @@ const styles = {
     }
 }
 
-const button = (Icon) => (
-    <IconButton style={styles.button}>
-        <Icon style={styles.icon} />
-        {' '}
-    </IconButton>
-)
-
 class Player extends React.Component {
     constructor(props, context) {
         super(props, context)
@@ -36,11 +29,29 @@ class Player extends React.Component {
     }
 
     render() {
+        const PlayPauseIcon = this.props.playing ? PauseIcon : PlayArrowIcon
+
         return (
             <div>
-                <span style={styles.wrapper}> {button(SkipPreviousIcon)} </span>
-                <span style={styles.wrapper}> {button(PlayArrowIcon)} </span>
-                <span style={styles.wrapper}> {button(SkipNextIcon)} </span>
+                <span style={styles.wrapper}>
+                    <IconButton style={styles.button} onClick={this.props.prev}>
+                        <SkipPreviousIcon style={styles.icon} />
+                        {' '}
+                    </IconButton>
+                </span>
+                <span style={styles.wrapper}>
+                    <IconButton style={styles.button}
+                                onClick={this.props.playing?this.props.pause:this.props.play}>
+                        <PlayPauseIcon style={styles.icon} />
+                        {' '}
+                    </IconButton>
+                </span>
+                <span style={styles.wrapper}>
+                    <IconButton style={styles.button} onClick={this.props.next}>
+                        <SkipNextIcon style={styles.icon} />
+                        {' '}
+                    </IconButton>
+                </span>
             </div>
         )
     }
