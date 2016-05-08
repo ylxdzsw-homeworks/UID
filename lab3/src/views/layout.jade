@@ -1,0 +1,44 @@
+mixin require(file)
+    -var suffix = file.split('.').slice(-1)[0]
+    case suffix
+        when 'js'
+            script(src="scripts/#{file}")
+        when 'css'
+            link(rel='stylesheet', href="styles/#{file}")
+
+mixin lib(file)
+    -var suffix = file.split('.').slice(-1)[0]
+    case suffix
+        when 'js'
+            script(src="lib/#{file}")
+        when 'css'
+            link(rel='stylesheet', href="lib/#{file}")
+
+doctype html
+html(lang='zh-cn')
+    head
+        meta(charset='utf-8')
+        meta(name='viewport', content="width=device-width, initial-scale=1, maximum-scale=1")
+
+        +lib("jquery.js")
+        +lib("underscore.js")
+
+        +lib("bootstrap.css")
+        +lib("bootstrap.js")
+
+        +require("layout.css")
+        +require("layout.js")
+
+        block head
+        block title
+            title mo-generator
+    body
+        div#navbar.clearfix
+            h1.pull-left: a(href="index.html") A02-2081寝室介绍
+            ul.pull-right.nav.nav-pills
+                li#navbar-member: a(href="member.html") 成员介绍
+                li#navbar-photo: a(href="#") 寝室照片
+                li#navbar-news: a(href="#") 大事记
+        div#content.hidden
+            block content
+

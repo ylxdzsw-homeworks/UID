@@ -1,0 +1,11 @@
+extends layout.jade
+
+append head
+    +require("index.css")
+    +require("index.js")
+
+block title
+    title 首页 | 2081
+
+block content
+    img(src="images/index.jpg", style="width: 100%")
